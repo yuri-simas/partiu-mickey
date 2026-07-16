@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partiu Mickey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF6ED;
+  --surface:#FFFFFF;
+  --ink:#2E4B4A;
+  --ink-2:#3E6362;
+  --ink-soft:#7C9998;
+  --border:#E4DFC9;
+  --accent:#D97A3F;
+  --accent-bg:#FBE7D8;
+  --teal:#2E8B84;
+  --teal-bg:#DFF1EF;
+  --danger:#C0473F;
+  --danger-bg:#F8E2E0;
+  --radius:12px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;-webkit-tap-highlight-color:transparent;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:500;color:var(--ink);margin:0;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+#header{padding:18px 18px 14px;position:sticky;top:0;background:var(--bg);z-index:5;}
+#header h1{font-size:22px;}
+#header .sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+#content{flex:1;padding:4px 18px 90px;}
+#banner-config{display:none;margin:0 18px 12px;padding:12px 14px;background:var(--danger-bg);color:var(--danger);border-radius:var(--radius);font-size:12.5px;line-height:1.5;}
+
+select,input,textarea{
+  font-family:'Inter',sans-serif;font-size:14px;color:var(--ink);
+  border:1px solid var(--border);border-radius:8px;padding:9px 10px;background:#fff;width:100%;
+}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-bg);}
+label.field-label{font-size:12px;color:var(--ink-soft);margin-bottom:4px;display:block;}
+.field{margin-bottom:10px;}
+.checkrow{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13.5px;}
+.checkrow input{width:auto;}
+
+button{font-family:'Inter',sans-serif;cursor:pointer;border-radius:8px;font-size:13.5px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--ink);padding:10px 14px;}
+button:hover{border-color:var(--ink-soft);}
+button.primary{background:var(--teal);color:#fff;border-color:var(--teal);}
+button.primary:hover{background:var(--ink-2);}
+button.ghost{background:transparent;border-color:transparent;color:var(--ink-soft);padding:6px 8px;font-weight:500;}
+button.ghost:hover{background:var(--surface);color:var(--ink);}
+button.danger-ghost{background:transparent;border-color:transparent;color:var(--danger);padding:6px 8px;font-weight:500;}
+button.danger-ghost:hover{background:var(--danger-bg);}
+button.block{width:100%;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat{background:var(--surface);border-radius:var(--radius);padding:14px;border:1px solid var(--border);}
+.stat .label{font-size:12px;color:var(--ink-soft);}
+.stat .value{font-size:21px;font-weight:600;margin-top:4px;font-family:'Fraunces',serif;}
+
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--teal-bg);color:var(--ink-2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.pill{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+.pill.pago{background:var(--teal-bg);color:var(--teal);}
+.pill.pendente{background:var(--accent-bg);color:var(--accent);}
+
+.section-title{font-size:12.5px;color:var(--ink-soft);margin:18px 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.section-title:first-child{margin-top:2px;}
+.empty{color:var(--ink-soft);font-size:13px;padding:10px 0;}
+.detail{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12.5px;color:var(--ink-soft);display:none;}
+.detail.open{display:block;}
+.detail div{display:flex;justify-content:space-between;padding:2px 0;}
+a{color:var(--teal);}
+
+#nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);}
+#nav-inner{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.navbtn{border:none;background:transparent;border-radius:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px 8px;color:var(--ink-soft);font-size:11px;font-weight:600;}
+.navbtn.active{color:var(--teal);}
+.navbtn .ic{font-size:18px;line-height:1;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <h1>Partiu Mickey</h1>
+    <div class="sub" id="header-sub">Orlando</div>
+  </div>
+
+  <div id="banner-config"></div>
+
+  <div id="content">
+    <div id="screen-resumo" class="screen">
+      <div class="stats">
+        <div class="stat"><div class="label">Total da viagem</div><div class="value" id="stat-total">R$ 0</div></div>
+        <div class="stat"><div class="label">Já pagaram</div><div class="value" id="stat-pagos">0 de 0</div></div>
+      </div>
+      <div class="section-title">Quanto cada um deve</div>
+      <div id="lista-resumo"></div>
+    </div>
+
+    <div id="screen-pessoas" class="screen" style="display:none;">
+      <div id="lista-pessoas"></div>
+      <div class="section-title">Adicionar pessoa</div>
+      <div class="card">
+        <div class="field"><label class="field-label">Nome</label><input id="np-nome" placeholder="Nome"></div>
+        <div class="field"><label class="field-label">Chega em</label><input id="np-entrada" type="date"></div>
+        <div class="field"><label class="field-label">Vai embora em</label><input id="np-saida" type="date"></div>
+        <button class="primary block" onclick="addPessoa()">Adicionar pessoa</button>
+      </div>
+    </div>
+
+    <div id="screen-airbnbs" class="screen" style="display:none;">
+      <div id="lista-airbnbs"></div>
+      <div class="section-title">Adicionar Airbnb</div>
+      <div class="card">
+        <div class="field"><label class="field-label">Apelido (ex: Casa perto da Disney)</label><input id="na-nome"></div>
+        <div class="field"><label class="field-label">Link do anúncio</label><input id="na-link" placeholder="https://airbnb.com/..."></div>
+        <div class="field"><label class="field-label">Check-in</label><input id="na-checkin" type="date"></div>
+        <div class="field"><label class="field-label">Check-out</label><input id="na-checkout" type="date"></div>
+        <div class="field"><label class="field-label">Valor total (R$)</label><input id="na-valor" type="number" step="0.01" placeholder="0,00"></div>
+        <button class="primary block" onclick="addAirbnb()">Adicionar Airbnb</button>
+      </div>
+    </div>
+
+    <div id="screen-gastos" class="screen" style="display:none;">
+      <div id="lista-gastos"></div>
+      <div class="section-title">Adicionar gasto</div>
+      <div class="card">
+        <div class="field"><label class="field-label">Descrição (ex: Uber pro parque)</label><input id="ng-descricao"></div>
+        <div class="field"><label class="field-label">Valor (R$)</label><input id="ng-valor" type="number" step="0.01" placeholder="0,00"></div>
+        <div class="field"><label class="field-label">Data (opcional)</label><input id="ng-data" type="date"></div>
+        <div class="field">
+          <label class="field-label">Quem participa desse gasto</label>
+          <div id="ng-participantes"></div>
+        </div>
+        <button class="primary block" onclick="addGasto()">Adicionar gasto</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="nav">
+    <div id="nav-inner">
+      <button class="navbtn" data-target="resumo" onclick="setScreen('resumo')"><span class="ic">&#128202;</span>Resumo</button>
+      <button class="navbtn" data-target="pessoas" onclick="setScreen('pessoas')"><span class="ic">&#128101;</span>Pessoas</button>
+      <button class="navbtn" data-target="airbnbs" onclick="setScreen('airbnbs')"><span class="ic">&#127968;</span>Airbnbs</button>
+      <button class="navbtn" data-target="gastos" onclick="setScreen('gastos')"><span class="ic">&#128176;</span>Gastos</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://istdocjznburoflmonei.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_jdf8EoL5zrA28lM-mqbu5w_tuH_lh0j';
+
+const configPendente = SUPABASE_URL.startsWith('COLOQUE_AQUI') || SUPABASE_ANON_KEY.startsWith('COLOQUE_AQUI');
+if (configPendente) {
+  document.getElementById('banner-config').style.display = 'block';
+  document.getElementById('banner-config').textContent = 'O app ainda não está conectado ao banco de dados. Preencha SUPABASE_URL e SUPABASE_ANON_KEY no topo do arquivo index.html.';
+}
+const sb = configPendente ? null : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let pessoas = [];
+let airbnbs = [];
+let gastos = [];
+let gastoParticipantes = {};
+let pagamentos = {};
+
+function fmt(n){
+  return (Math.round((n + Number.EPSILON) * 100) / 100).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtDate(d){
+  if(!d) return '';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}`;
+}
+function iniciais(nome){
+  return nome.trim().slice(0,2).toUpperCase();
+}
+
+async function loadAll(){
+  if (!sb) return;
+  const [pRes, aRes, gRes, gpRes, payRes] = await Promise.all([
+    sb.from('pessoas').select('*').order('created_at'),
+    sb.from('airbnbs').select('*').order('created_at'),
+    sb.from('gastos').select('*').order('created_at'),
+    sb.from('gasto_participantes').select('*'),
+    sb.from('pagamentos').select('*')
+  ]);
+  pessoas = pRes.data || [];
+  airbnbs = aRes.data || [];
+  gastos = gRes.data || [];
+  gastoParticipantes = {};
+  (gpRes.data || []).forEach(row => {
+    if (!gastoParticipantes[row.gasto_id]) gastoParticipantes[row.gasto_id] = [];
+    gastoParticipantes[row.gasto_id].push(row.pessoa_id);
+  });
+  pagamentos = {};
+  (payRes.data || []).forEach(row => { pagamentos[row.pessoa_id] = row.pago; });
+
+  if (pessoas.length){
+    const inicio = pessoas.reduce((min,p) => p.data_entrada < min ? p.data_entrada : min, pessoas[0].data_entrada);
+    const fim = pessoas.reduce((max,p) => p.data_saida > max ? p.data_saida : max, pessoas[0].data_saida);
+    document.getElementById('header-sub').textContent = `${fmtDate(inicio)} - ${fmtDate(fim)}`;
+  }
+
+  renderAll();
+}
+
+// ---------- cálculo do racha ----------
+function getNightsBetween(startStr, endStr){
+  const nights = [];
+  let d = new Date(startStr + 'T00:00:00');
+  const end = new Date(endStr + 'T00:00:00');
+  while (d < end){
+    nights.push(d.toISOString().slice(0,10));
+    d.setDate(d.getDate() + 1);
+  }
+  return nights;
+}
+
+function airbnbShare(pessoaId){
+  let total = 0;
+  for (const ab of airbnbs){
+    const nights = getNightsBetween(ab.data_checkin, ab.data_checkout);
+    if (!nights.length) continue;
+    const perNight = ab.valor_total / nights.length;
+    for (const night of nights){
+      const presentes = pessoas.filter(p => p.data_entrada <= night && p.data_saida > night);
+      if (!presentes.length) continue;
+      if (presentes.some(p => p.id === pessoaId)) total += perNight / presentes.length;
+    }
+  }
+  return total;
+}
+
+function gastosShare(pessoaId){
+  let total = 0;
+  for (const g of gastos){
+    const participantes = gastoParticipantes[g.id] || [];
+    if (!participantes.length) continue;
+    if (participantes.includes(pessoaId)) total += g.valor / participantes.length;
+  }
+  return total;
+}
+
+function totalPessoa(pessoaId){
+  return airbnbShare(pessoaId) + gastosShare(pessoaId);
+}
+
+// ---------- navegação ----------
+function setScreen(target){
+  document.querySelectorAll('.screen').forEach(s => s.style.display = (s.id === 'screen-' + target) ? 'block' : 'none');
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('active', b.dataset.target === target));
+  if (target === 'gastos') renderParticipantesCheckboxes();
+}
+
+// ---------- render ----------
+function renderAll(){
+  renderResumo();
+  renderPessoas();
+  renderAirbnbs();
+  renderGastos();
+  renderParticipantesCheckboxes();
+}
+
+function renderResumo(){
+  const totalViagem = airbnbs.reduce((s,a) => s + Number(a.valor_total), 0) + gastos.reduce((s,g) => s + Number(g.valor), 0);
+  document.getElementById('stat-total').textContent = 'R$ ' + fmt(totalViagem);
+  const pagosCount = pessoas.filter(p => pagamentos[p.id]).length;
+  document.getElementById('stat-pagos').textContent = `${pagosCount} de ${pessoas.length}`;
+
+  const el = document.getElementById('lista-resumo');
+  if (!pessoas.length){ el.innerHTML = '<div class="empty">Cadastre as pessoas da viagem na aba Pessoas.</div>'; return; }
+
+  el.innerHTML = pessoas.map(p => {
+    const ab = airbnbShare(p.id);
+    const ga = gastosShare(p.id);
+    const total = ab + ga;
+    const pago = !!pagamentos[p.id];
+    return `
+      <div class="card">
+        <div class="row" style="cursor:pointer;" onclick="toggleDetail('${p.id}')">
+          <div class="row" style="gap:10px;">
+            <div class="avatar">${iniciais(p.nome)}</div>
+            <span style="font-weight:500;">${p.nome}</span>
+          </div>
+          <div class="row" style="gap:10px;">
+            <span style="font-weight:600;">R$ ${fmt(total)}</span>
+            <span class="pill ${pago ? 'pago' : 'pendente'}" onclick="event.stopPropagation();togglePago('${p.id}')">${pago ? 'Pago' : 'Pendente'}</span>
+          </div>
+        </div>
+        <div class="detail" id="detail-${p.id}">
+          <div><span>Parte do(s) Airbnb(s)</span><span>R$ ${fmt(ab)}</span></div>
+          <div><span>Parte de outros gastos</span><span>R$ ${fmt(ga)}</span></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleDetail(pessoaId){
+  document.getElementById('detail-' + pessoaId).classList.toggle('open');
+}
+
+async function togglePago(pessoaId){
+  const novoStatus = !pagamentos[pessoaId];
+  pagamentos[pessoaId] = novoStatus;
+  renderResumo();
+  await sb.from('pagamentos').upsert({ pessoa_id: pessoaId, pago: novoStatus, marcado_em: new Date().toISOString() });
+}
+
+function renderPessoas(){
+  const el = document.getElementById('lista-pessoas');
+  if (!pessoas.length){ el.innerHTML = '<div class="empty">Nenhuma pessoa cadastrada ainda.</div>'; return; }
+  el.innerHTML = pessoas.map(p => `
+    <div class="card">
+      <div class="row">
+        <div class="row" style="gap:10px;">
+          <div class="avatar">${iniciais(p.nome)}</div>
+          <span style="font-weight:500;">${p.nome}</span>
+        </div>
+        <button class="danger-ghost" onclick="deletePessoa('${p.id}')">Remover</button>
+      </div>
+      <div class="row" style="margin-top:10px;gap:10px;">
+        <div class="field" style="flex:1;margin-bottom:0;">
+          <label class="field-label">Chega em</label>
+          <input type="date" value="${p.data_entrada}" onchange="updatePessoaData('${p.id}','data_entrada',this.value)">
+        </div>
+        <div class="field" style="flex:1;margin-bottom:0;">
+          <label class="field-label">Vai embora em</label>
+          <input type="date" value="${p.data_saida}" onchange="updatePessoaData('${p.id}','data_saida',this.value)">
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function addPessoa(){
+  const nome = document.getElementById('np-nome').value.trim();
+  const entrada = document.getElementById('np-entrada').value;
+  const saida = document.getElementById('np-saida').value;
+  if (!nome || !entrada || !saida){ alert('Preencha nome, data de chegada e data de saída.'); return; }
+  const { error } = await sb.from('pessoas').insert({ nome, data_entrada: entrada, data_saida: saida });
+  if (error){ alert('Erro ao adicionar pessoa: ' + error.message); return; }
+  document.getElementById('np-nome').value = '';
+  document.getElementById('np-entrada').value = '';
+  document.getElementById('np-saida').value = '';
+  await loadAll();
+}
+
+async function deletePessoa(id){
+  if (!confirm('Remover essa pessoa? Isso também remove a participação dela nos gastos.')) return;
+  await sb.from('pessoas').delete().eq('id', id);
+  await loadAll();
+}
+
+async function updatePessoaData(id, campo, valor){
+  await sb.from('pessoas').update({ [campo]: valor }).eq('id', id);
+  await loadAll();
+}
+
+function renderAirbnbs(){
+  const el = document.getElementById('lista-airbnbs');
+  if (!airbnbs.length){ el.innerHTML = '<div class="empty">Nenhum Airbnb cadastrado ainda.</div>'; return; }
+  el.innerHTML = airbnbs.map(a => {
+    const nights = getNightsBetween(a.data_checkin, a.data_checkout).length;
+    return `
+    <div class="card">
+      <div class="row">
+        <span style="font-weight:500;">${a.nome_apelido}</span>
+        <button class="danger-ghost" onclick="deleteAirbnb('${a.id}')">Remover</button>
+      </div>
+      <div style="color:var(--ink-soft);font-size:12.5px;margin-top:4px;">${fmtDate(a.data_checkin)} a ${fmtDate(a.data_checkout)} · ${nights} noite(s)</div>
+      <div style="color:var(--ink-soft);font-size:12.5px;margin-top:2px;">R$ ${fmt(a.valor_total)} no total</div>
+      ${a.link ? `<div style="margin-top:6px;"><a href="${a.link}" target="_blank" rel="noopener">Ver anúncio</a></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function addAirbnb(){
+  const nome_apelido = document.getElementById('na-nome').value.trim();
+  const link = document.getElementById('na-link').value.trim();
+  const checkin = document.getElementById('na-checkin').value;
+  const checkout = document.getElementById('na-checkout').value;
+  const valor_total = parseFloat(document.getElementById('na-valor').value);
+  if (!nome_apelido || !checkin || !checkout || isNaN(valor_total)){ alert('Preencha apelido, datas e valor.'); return; }
+  if (checkout <= checkin){ alert('A data de check-out precisa ser depois do check-in.'); return; }
+  const { error } = await sb.from('airbnbs').insert({ nome_apelido, link, data_checkin: checkin, data_checkout: checkout, valor_total });
+  if (error){ alert('Erro ao adicionar Airbnb: ' + error.message); return; }
+  document.getElementById('na-nome').value = '';
+  document.getElementById('na-link').value = '';
+  document.getElementById('na-checkin').value = '';
+  document.getElementById('na-checkout').value = '';
+  document.getElementById('na-valor').value = '';
+  await loadAll();
+}
+
+async function deleteAirbnb(id){
+  if (!confirm('Remover esse Airbnb?')) return;
+  await sb.from('airbnbs').delete().eq('id', id);
+  await loadAll();
+}
+
+function renderParticipantesCheckboxes(){
+  const el = document.getElementById('ng-participantes');
+  if (!el) return;
+  el.innerHTML = pessoas.map(p => `
+    <label class="checkrow">
+      <input type="checkbox" value="${p.id}" class="ng-participante-check" checked>
+      ${p.nome}
+    </label>
+  `).join('');
+}
+
+function renderGastos(){
+  const el = document.getElementById('lista-gastos');
+  if (!gastos.length){ el.innerHTML = '<div class="empty">Nenhum gasto extra cadastrado ainda.</div>'; return; }
+  el.innerHTML = gastos.map(g => {
+    const participantes = (gastoParticipantes[g.id] || []).map(id => pessoas.find(p => p.id === id)?.nome).filter(Boolean);
+    return `
+    <div class="card">
+      <div class="row">
+        <span style="font-weight:500;">${g.descricao}</span>
+        <button class="danger-ghost" onclick="deleteGasto('${g.id}')">Remover</button>
+      </div>
+      <div style="color:var(--ink-soft);font-size:12.5px;margin-top:4px;">R$ ${fmt(g.valor)}${g.data ? ' · ' + fmtDate(g.data) : ''}</div>
+      <div style="color:var(--ink-soft);font-size:12.5px;margin-top:2px;">${participantes.length ? participantes.join(', ') : 'sem participantes definidos'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function addGasto(){
+  const descricao = document.getElementById('ng-descricao').value.trim();
+  const valor = parseFloat(document.getElementById('ng-valor').value);
+  const data = document.getElementById('ng-data').value || null;
+  const participantes = Array.from(document.querySelectorAll('.ng-participante-check:checked')).map(el => el.value);
+  if (!descricao || isNaN(valor)){ alert('Preencha a descrição e o valor.'); return; }
+  if (!participantes.length){ alert('Selecione ao menos uma pessoa que participa desse gasto.'); return; }
+  const { data: novoGasto, error } = await sb.from('gastos').insert({ descricao, valor, data }).select().single();
+  if (error){ alert('Erro ao adicionar gasto: ' + error.message); return; }
+  const linhas = participantes.map(pessoa_id => ({ gasto_id: novoGasto.id, pessoa_id }));
+  await sb.from('gasto_participantes').insert(linhas);
+  document.getElementById('ng-descricao').value = '';
+  document.getElementById('ng-valor').value = '';
+  document.getElementById('ng-data').value = '';
+  await loadAll();
+}
+
+async function deleteGasto(id){
+  if (!confirm('Remover esse gasto?')) return;
+  await sb.from('gastos').delete().eq('id', id);
+  await loadAll();
+}
+
+loadAll();
+</script>
+</body>
+</html>
