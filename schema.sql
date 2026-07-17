@@ -27,8 +27,12 @@ create table if not exists gastos (
   descricao text not null,
   valor numeric not null default 0,
   data date,
+  parcelas integer not null default 1,
   created_at timestamptz default now()
 );
+
+-- Se a tabela gastos já existia (banco criado antes do parcelamento ser adicionado):
+alter table gastos add column if not exists parcelas integer not null default 1;
 
 create table if not exists gasto_participantes (
   gasto_id uuid references gastos(id) on delete cascade,

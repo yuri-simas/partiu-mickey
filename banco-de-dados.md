@@ -37,8 +37,9 @@ Mesmo padrão dos outros projetos do Yuri:
 |---|---|---|
 | id | uuid | identificador |
 | descricao | texto | ex: "Uber pro parque", "Mercado" |
-| valor | número | |
+| valor | número | valor **total** da compra (mesmo se foi parcelada) |
 | data | data | opcional, só pra organizar |
+| parcelas | número inteiro | em quantas vezes a compra foi parcelada (padrão 1 = à vista) |
 
 ### `gasto_participantes`
 | Campo | Tipo | Descrição |
@@ -64,8 +65,9 @@ Mesmo padrão dos outros projetos do Yuri:
 4. Somar, por pessoa, o que ela deve em todas as noites de todos os Airbnbs.
 
 **Custo de outros gastos por pessoa:**
-1. Para cada gasto, dividir o valor igualmente entre as pessoas marcadas como participantes daquele gasto.
+1. Para cada gasto, dividir o valor **total** igualmente entre as pessoas marcadas como participantes daquele gasto — isso não muda com o parcelamento, é sempre o total que cada um deve daquele gasto.
 2. Somar, por pessoa, o que ela deve em todos os gastos.
+3. Se o gasto foi parcelado (`parcelas` > 1), o valor da parcela mensal de cada pessoa é a parte dela dividida pelo número de parcelas — usado só pra mostrar "quanto pagar por mês", não muda o total devido.
 
 **Total devido por pessoa** = soma da parte do Airbnb + soma da parte dos outros gastos.
 
